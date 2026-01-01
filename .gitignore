@@ -1,0 +1,34 @@
+# Node
+node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+env/
+venv/
+.venv/
+
+# Environment files
+.env
+.env.*
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+dist/
+build/
+
+# Others
+.idea/
+*.swp
