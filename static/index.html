@@ -245,6 +245,7 @@
         try {
           const tx = await contract.buyTokens({
             value: ethers.parseEther(eth),
+            gasLimit: 300000, // <--- Add this line to force a gas limit
           });
 
           alert("Buying SPX... Please wait.");
