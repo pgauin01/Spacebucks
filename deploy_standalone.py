@@ -15,9 +15,7 @@ TOKEN_NAME = "SpaceBucks"
 TOKEN_SYMBOL = "SPX"
 TOKEN_SUPPLY = 1000
 
-# 1. COMPLETE, FLATTENED SOLIDITY CODE (v0.8.19 compatible)
-# We embed the standard ERC20 logic here so you don't need external files.
-# Updated Solidity Source for SpaceBucks V2
+# 1. UPDATED V3 SOLIDITY CODE (Marketplace Logic)
 SOLIDITY_SOURCE = """
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
@@ -27,16 +25,30 @@ contract SpaceBucks {
     string public symbol;
     uint8 public decimals = 18;
     uint256 public totalSupply;
+    
+    // 1 ETH = 1000 SPX (Simple Exchange Rate)
+    uint256 public constant RATE = 1000; 
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-    // --- NEW: EVENTS FOR QUESTIONS ---
-    // This logs the question to the blockchain history
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event QuestionPosted(address indexed author, string content, uint256 timestamp);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    // --- STRUCTS & MAPPINGS ---
+    struct Question {
+        address author;
+        string content;
+        uint256 bounty;
+        bool solved;
+    }
+    mapping(uint256 => Question) public questions;
+    uint256 public nextQuestionId;
 
+    // --- EVENTS ---
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event TokensPurchased(address indexed buyer, uint256 amountETH, uint256 amountSPX);
+    event QuestionPosted(uint256 indexed questionId, address indexed author, string content, uint256 bounty);
+    event AnswerPosted(uint256 indexed questionId, address indexed answerer, string content);
+    event BountyAwarded(uint256 indexed questionId, address indexed winner, uint256 amount);
 
     constructor(string memory _name, string memory _symbol, uint256 _supply) {
         name = _name;
@@ -44,14 +56,57 @@ contract SpaceBucks {
         _mint(msg.sender, _supply * 10**decimals);
     }
 
-    // --- NEW: FUNCTION TO POST QUESTION ---
-    function postQuestion(string memory content) external {
-        // You could add a fee here! e.g., require(balanceOf[msg.sender] >= 10);
-        emit QuestionPosted(msg.sender, content, block.timestamp);
+    // --- 1. BUY TOKENS (Crowdsale) ---
+    function buyTokens() external payable {
+        require(msg.value > 0, "Send ETH to buy tokens");
+        uint256 tokensToBuy = msg.value * RATE; // Calculate SPX amount
+        _mint(msg.sender, tokensToBuy);
+        emit TokensPurchased(msg.sender, msg.value, tokensToBuy);
     }
 
+    // --- 2. POST QUESTION (With Bounty) ---
+    function postQuestion(string memory content, uint256 bounty) external {
+        // Transfer bounty from User -> Contract (Escrow)
+        require(balanceOf[msg.sender] >= bounty, "Insufficient SPX for bounty");
+        _transfer(msg.sender, address(this), bounty);
+
+        questions[nextQuestionId] = Question(msg.sender, content, bounty, false);
+        emit QuestionPosted(nextQuestionId, msg.sender, content, bounty);
+        nextQuestionId++;
+    }
+
+    // --- 3. ANSWER (Just an event for cheap storage) ---
+    function postAnswer(uint256 questionId, string memory content) external {
+        emit AnswerPosted(questionId, msg.sender, content);
+    }
+
+    // --- 4. SELECT WINNER ---
+    function awardBounty(uint256 questionId, address winner) external {
+        Question storage q = questions[questionId];
+        require(msg.sender == q.author, "Only author can pick winner");
+        require(!q.solved, "Bounty already awarded");
+        
+        q.solved = true;
+        _transfer(address(this), winner, q.bounty); // Contract pays the winner
+        emit BountyAwarded(questionId, winner, q.bounty);
+    }
+
+    // --- STANDARD ERC20 LOGIC ---
     function transfer(address recipient, uint256 amount) external returns (bool) {
         return _transfer(msg.sender, recipient, amount);
+    }
+    
+    function approve(address spender, uint256 amount) external returns (bool) {
+        allowance[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
+    }
+
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
+        uint256 currentAllowance = allowance[sender][msg.sender];
+        require(currentAllowance >= amount, "ERC20: transfer amount exceeds allowance");
+        allowance[sender][msg.sender] = currentAllowance - amount;
+        return _transfer(sender, recipient, amount);
     }
 
     function _transfer(address sender, address recipient, uint256 amount) internal returns (bool) {
@@ -67,21 +122,6 @@ contract SpaceBucks {
         balanceOf[to] += amount;
         emit Transfer(address(0), to, amount);
     }
-    function approve(address spender, uint256 amount) external returns (bool) {
-    allowance[msg.sender][spender] = amount;
-    emit Approval(msg.sender, spender, amount);
-    return true;
-    }
-
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool) {
-    uint256 allowed = allowance[sender][msg.sender];
-    require(allowed >= amount, "ERC20: allowance exceeded");
-
-    allowance[sender][msg.sender] = allowed - amount;
-    _transfer(sender, recipient, amount);
-    return true;
-    }
-
 }
 """
 

@@ -18,14 +18,17 @@
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
+
+      /* Button Styles */
       .btn {
         background: #2196f3;
         color: white;
         border: none;
-        padding: 10px;
-        border-radius: 6px;
+        padding: 10px 16px;
+        border-radius: 8px;
         cursor: pointer;
         font-weight: bold;
+        transition: background 0.2s;
       }
       .btn:hover {
         background: #1976d2;
@@ -43,38 +46,69 @@
       .btn-gold:hover {
         background: #ffb300;
       }
+
       input,
       textarea {
         width: 100%;
         padding: 12px;
         margin: 5px 0;
         border: 1px solid #ddd;
-        border-radius: 6px;
+        border-radius: 8px;
         box-sizing: border-box;
       }
 
-      /* Layout */
+      /* Header & Wallet Badge */
       .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
       }
-      .panel {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        border: 1px solid #eee;
+
+      .wallet-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f1f3f4;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+      }
+      .wallet-address {
+        font-weight: bold;
+        color: #2196f3;
+        font-family: monospace;
+        font-size: 1.1em;
+      }
+      .wallet-balance {
+        font-weight: bold;
+        color: #4caf50; /* Green for Tokens */
+      }
+      .eth-balance {
+        font-weight: bold;
+        color: #333; /* Dark for ETH */
       }
 
-      /* Question Cards */
+      .panel {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #e1e4e8;
+      }
+
+      /* Feed Styles */
       .q-card {
         border: 1px solid #e1e4e8;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 16px;
         background: white;
+        transition: transform 0.1s;
+      }
+      .q-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       }
       .q-meta {
         font-size: 0.85rem;
@@ -86,41 +120,43 @@
       .q-body {
         font-size: 1.1rem;
         font-weight: 600;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        color: #2c3e50;
       }
       .bounty-tag {
         background: #fff3cd;
         color: #856404;
-        padding: 2px 8px;
+        padding: 4px 10px;
         border-radius: 12px;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         font-weight: bold;
+        border: 1px solid #ffeeba;
       }
 
-      /* Answer Section */
       .answers-area {
-        margin-top: 10px;
-        padding-top: 10px;
+        margin-top: 12px;
+        padding-top: 12px;
         border-top: 1px dashed #eee;
-        display: none;
       }
       .a-card {
-        background: #f1f8ff;
-        padding: 10px;
+        background: #f8f9fa;
+        padding: 10px 14px;
         margin-top: 8px;
-        border-radius: 6px;
+        border-radius: 8px;
         font-size: 0.95rem;
+        border-left: 3px solid #ccc;
       }
       .winner {
         background: #d4edda;
-        border: 1px solid #c3e6cb;
+        border-left: 3px solid #28a745;
+        color: #155724;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <div class="header">
-        <h1>🚀 SpaceBucks Exchange</h1>
+        <h1>🚀 SpaceBucks</h1>
         <div id="walletInfo">
           <button class="btn" onclick="connectWallet()">
             🦊 Connect Wallet
@@ -130,8 +166,10 @@
 
       <div id="appSection" style="display: none">
         <div class="panel">
-          <h3>💰 Buy SpaceBucks (SPX)</h3>
-          <p style="font-size: 0.9rem; color: #666">Rate: 1 ETH = 1000 SPX</p>
+          <h3>💰 Buy SpaceBucks</h3>
+          <p style="font-size: 0.9rem; color: #666">
+            Exchange Rate: 1 ETH = 1000 SPX
+          </p>
           <div style="display: flex; gap: 10px">
             <input
               type="number"
@@ -139,19 +177,27 @@
               placeholder="ETH Amount (e.g. 0.1)"
               step="0.01"
             />
-            <button class="btn btn-green" onclick="buyTokens()">Buy SPX</button>
+            <button class="btn btn-green" onclick="buyTokens()">
+              Buy Tokens
+            </button>
           </div>
-          <p><strong>My Balance:</strong> <span id="balance">0</span> SPX</p>
         </div>
 
         <div class="panel">
-          <h3>📝 Ask a Question</h3>
+          <h3>📝 Ask the Community</h3>
           <textarea
             id="qContent"
             rows="2"
-            placeholder="What do you want to know?"
+            placeholder="What is your question?"
           ></textarea>
-          <div style="display: flex; gap: 10px; align-items: center">
+          <div
+            style="
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              margin-top: 10px;
+            "
+          >
             <input
               type="number"
               id="qBounty"
@@ -164,15 +210,17 @@
           </div>
         </div>
 
-        <h3>🔥 Live Marketplace</h3>
+        <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px">
+          🔥 Live Questions
+        </h3>
         <div id="feed">Loading...</div>
       </div>
     </div>
 
     <script>
-      // --- PASTE NEW CONTRACT ADDRESS HERE ---
-      const contractAddress = "0x25aa8313aC369332Dc48ef9d28bB3040B36ae6eB";
-      // ---------------------------------------
+      // --- CONFIGURATION ---
+      const contractAddress = "0x8F9d3de59C77c4522f1C62cDb1F386a792D0D138"; // <--- PASTE YOUR ADDRESS
+      // ---------------------
 
       const abi = [
         "function balanceOf(address) view returns (uint256)",
@@ -186,48 +234,83 @@
         "event BountyAwarded(uint256 indexed questionId, address indexed winner, uint256 amount)",
       ];
 
-      let provider, signer, contract, userAddress;
+      let provider, signer, contract, userAddress, userBalance;
 
-      async function connectWallet() {
-        if (!window.ethereum) {
-          alert("MetaMask not found");
-          return;
+      // 1. Auto-Connect on Load
+      window.onload = async () => {
+        if (window.ethereum) {
+          // Listen for account changes
+          window.ethereum.on("accountsChanged", handleAccountsChanged);
+          window.ethereum.on("chainChanged", () => window.location.reload());
+
+          // Check if already connected
+          const accounts = await window.ethereum.request({
+            method: "eth_accounts",
+          });
+          if (accounts.length > 0) {
+            connectWallet();
+          }
         }
+      };
 
-        // 🔑 MUST be first async action
-        await window.ethereum.request({
-          method: "eth_requestAccounts",
-        });
-
-        // Everything else comes AFTER
-        provider = new ethers.BrowserProvider(window.ethereum);
-        signer = await provider.getSigner();
-        userAddress = await signer.getAddress();
-
-        contract = new ethers.Contract(contractAddress, abi, signer);
-
-        document.getElementById("appSection").style.display = "block";
-
-        await updateBalance();
-        await loadFeed();
+      async function handleAccountsChanged(accounts) {
+        if (accounts.length === 0) {
+          console.log("Please connect to MetaMask.");
+          window.location.reload();
+        } else {
+          // Re-connect with new account
+          connectWallet();
+        }
       }
 
-      async function updateBalance() {
+      async function connectWallet() {
+        if (!window.ethereum) return alert("Install MetaMask!");
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        // Request Access
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+        contract = new ethers.Contract(contractAddress, abi, signer);
+
+        // Update UI
+        document.getElementById("appSection").style.display = "block";
+        updateHeader();
+        loadFeed();
+      }
+
+      async function updateHeader() {
+        if (!contract) return;
         try {
-          console.log("Updating balance...");
-          console.log("User:", userAddress);
-          console.log("Contract:", contract.target);
+          // 1. Get SpaceBucks Balance
+          const rawToken = await contract.balanceOf(userAddress);
+          userBalance = ethers.formatUnits(rawToken, 18);
 
-          const raw = await contract.balanceOf(userAddress);
-          console.log("Raw balance:", raw.toString());
+          // 2. Get ETH Balance (Added Feature)
+          const rawEth = await provider.getBalance(userAddress);
+          const ethBalance = ethers.formatEther(rawEth);
 
-          const decimals = await contract.decimals();
-          document.getElementById("balance").innerText = ethers.formatUnits(
-            raw,
-            decimals
-          );
+          // Shorten Address: 0x1234...5678
+          const shortAddr =
+            userAddress.substring(0, 6) + "..." + userAddress.substring(38);
+
+          const badgeHTML = `
+                <div class="wallet-badge">
+                    <span class="eth-balance">${parseFloat(ethBalance).toFixed(
+                      4
+                    )} ETH</span>
+                    <span style="color:#ddd">|</span>
+                    <span class="wallet-balance">${parseFloat(
+                      userBalance
+                    ).toFixed(1)} SPX</span>
+                    <span style="color:#ddd">|</span>
+                    <span class="wallet-address" title="${userAddress}">${shortAddr}</span>
+                </div>
+            `;
+          document.getElementById("walletInfo").innerHTML = badgeHTML;
         } catch (e) {
-          console.error("updateBalance failed:", e);
+          console.error("Balance Error:", e);
         }
       }
 
@@ -235,26 +318,18 @@
 
       async function buyTokens() {
         const eth = document.getElementById("ethAmount").value;
-        console.log("eth", eth);
-
-        if (!eth || Number(eth) <= 0) {
-          alert("Enter a valid ETH amount");
-          return;
-        }
-
+        if (!eth) return;
         try {
           const tx = await contract.buyTokens({
             value: ethers.parseEther(eth),
-            gasLimit: 300000, // <--- Add this line to force a gas limit
+            gasLimit: 300000, // Force gas limit for Ganache
           });
-
-          alert("Buying SPX... Please wait.");
           await tx.wait();
-          await updateBalance();
-          alert("Purchase Successful!");
+          updateHeader(); // Refresh header balance
+          alert("Bought SPX Successfully!");
         } catch (e) {
           console.error(e);
-          alert("Transaction failed");
+          alert("Error: " + e.message);
         }
       }
 
@@ -268,8 +343,10 @@
           const tx = await contract.postQuestion(content, bountyWei);
           document.getElementById("qContent").value = "Minting...";
           await tx.wait();
+
           document.getElementById("qContent").value = "";
-          loadFeed(); // Refresh
+          updateHeader(); // Refresh header balance (bounty deducted)
+          loadFeed();
         } catch (e) {
           console.error(e);
           alert("Error: " + e.message);
@@ -294,6 +371,7 @@
         try {
           const tx = await contract.awardBounty(qId, winnerAddr);
           await tx.wait();
+          updateHeader();
           loadFeed();
           alert("Bounty Awarded!");
         } catch (e) {
@@ -302,44 +380,26 @@
         }
       }
 
-      // --- FEED LOGIC (The Hard Part) ---
+      // --- FEED LOGIC (Using "earliest" for Ganache) ---
 
       async function loadFeed() {
-        console.log("Loading feed...");
         const feed = document.getElementById("feed");
         feed.innerHTML = "";
-        // 1. Get Questions
-        async function fetchLogs(filter) {
-          const latest = await provider.getBlockNumber();
-          const STEP = 900;
-          let logs = [];
-          for (
-            let from = Math.max(latest - 5000, 0);
-            from <= latest;
-            from += STEP
-          ) {
-            const to = Math.min(from + STEP - 1, latest);
-            logs.push(...(await contract.queryFilter(filter, from, to)));
-          }
-          return logs;
-        }
-        async function safeFetch(filter) {
-          try {
-            return await fetchLogs(filter);
-          } catch (e) {
-            console.warn("Log fetch failed for", filter, e);
-            return [];
-          }
-        }
 
-        const questions = await safeFetch(contract.filters.QuestionPosted());
-        const answers = await safeFetch(contract.filters.AnswerPosted());
-        const winners = await safeFetch(contract.filters.BountyAwarded());
+        const qFilter = contract.filters.QuestionPosted();
+        const aFilter = contract.filters.AnswerPosted();
+        const wFilter = contract.filters.BountyAwarded();
 
-        const solvedMap = {}; // store which questions are solved
+        // Use "earliest" to prevent Ganache errors
+        const [questions, answers, winners] = await Promise.all([
+          contract.queryFilter(qFilter, "earliest", "latest"),
+          contract.queryFilter(aFilter, "earliest", "latest"),
+          contract.queryFilter(wFilter, "earliest", "latest"),
+        ]);
+
+        const solvedMap = {};
         winners.forEach((w) => (solvedMap[w.args[0]] = true));
 
-        // Render Questions (Newest First)
         questions.reverse().forEach((q) => {
           const qId = q.args[0];
           const author = q.args[1];
@@ -347,50 +407,55 @@
           const bounty = ethers.formatUnits(q.args[3], 18);
           const isSolved = solvedMap[qId];
 
-          // Filter answers for this question
           const qAnswers = answers.filter((a) => a.args[0] == qId);
-          if (questions.length === 0) {
-            feed.innerHTML = "<p>No questions yet. Be the first 🚀</p>";
-            return;
-          }
 
           const div = document.createElement("div");
-
           div.className = "q-card";
           div.innerHTML = `
                 <div class="q-meta">
-                    <span>${author.substring(0, 6)}...</span>
-                    <span class="bounty-tag">${bounty} SPX Bounty</span>
+                    <span style="font-weight:bold; color:#555;">${author.substring(
+                      0,
+                      6
+                    )}...</span>
+                    <span class="bounty-tag">${bounty} SPX</span>
                 </div>
                 <div class="q-body">${content}</div>
-                <div style="font-size:0.9rem; color:#888;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
                     ${
                       isSolved
-                        ? '✅ <span style="color:green; font-weight:bold;">SOLVED</span>'
-                        : `<button class="btn btn-gold" onclick="postAnswer(${qId})" style="padding:2px 8px; font-size:0.8rem;">Reply</button>`
+                        ? '<span style="color:green; font-weight:bold;">✅ SOLVED</span>'
+                        : `<button class="btn btn-gold" onclick="postAnswer(${qId})" style="padding:4px 10px; font-size:0.8rem;">Reply</button>`
                     }
+                    <span style="font-size:0.8rem; color:#888;">${
+                      qAnswers.length
+                    } Answers</span>
                 </div>
                 <div class="answers-area" style="display:block;">
                     ${qAnswers
                       .map((a) => {
                         const aAuth = a.args[1];
                         const aText = a.args[2];
-                        // Show "Select Winner" button ONLY if: You are author AND not solved
                         const showSelect =
                           userAddress.toLowerCase() == author.toLowerCase() &&
                           !isSolved;
+                        const isWinner = winners.some(
+                          (w) =>
+                            w.args[0] == qId &&
+                            w.args[1].toLowerCase() == aAuth.toLowerCase()
+                        );
 
                         return `
-                        <div class="a-card">
-                            <strong>${aAuth.substring(
-                              0,
-                              6
-                            )}...</strong>: ${aText}
-                            ${
-                              showSelect
-                                ? `<button onclick="selectWinner(${qId}, '${aAuth}')" style="float:right; font-size:0.7rem;">🏆 Select</button>`
-                                : ""
-                            }
+                        <div class="a-card ${isWinner ? "winner" : ""}">
+                            <div style="display:flex; justify-content:space-between;">
+                                <strong>${aAuth.substring(0, 6)}...</strong>
+                                ${
+                                  showSelect
+                                    ? `<button onclick="selectWinner(${qId}, '${aAuth}')" style="cursor:pointer; border:1px solid #ccc; background:#fff; border-radius:4px;">🏆 Award</button>`
+                                    : ""
+                                }
+                                ${isWinner ? "<span>🏆 WINNER</span>" : ""}
+                            </div>
+                            <div style="margin-top:4px;">${aText}</div>
                         </div>`;
                       })
                       .join("")}
